@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mangrove Rescue</title>
+<style>
+/* =========================================================
+   MANGROVE RESCUE 
+
+   ========================================================= */
+
+/* Font: Roboto Mono Medium for normal text, Roboto Bold for headings */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&family=Roboto+Mono:wght@500&display=swap');
+
+:root {
+  --teal-deep: #061c1a;
+  --teal-base: #0a2e2a;
+  --teal-mid: #0d4a42;
+  --teal-light: #1a7a6e;
+  --teal-bright: #26c5a3;
+  --teal-glow: #3de8c4;
+  --amber: #e8a234;
+  --amber-light: #f5c76e;
+  --red-alert: #e05252;
+  --red-glow: #ff6b6b;
+  --green-ok: #4caf7d;
+  --green-bright: #64ffb4;
+  --blue: #64b5f6;
+  --sand: #c8b89a;
+  --cream: #f2ede6;
+  --text: #d4ede9;
+  --muted: #8ab8b0;
+  --dim: #4a7a72;
+  --border: rgba(38, 197, 163, 0.25);
+  --border-strong: rgba(38, 197, 163, 0.55);
+  --glass: rgba(10, 46, 42, 0.76);
+  --glass-strong: rgba(6, 28, 26, 0.94);
+  --shadow-teal: 0 0 34px rgba(38, 197, 163, 0.18);
+  --font-main: 'Roboto Mono', monospace;
+  --font-heading: 'Roboto', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; min-height: 100%; }
+body {
+  overflow-x: hidden;
+  background: var(--teal-deep);
+  color: var(--text);
+  font-family: var(--font-main);
+  font-weight: 500;
+  user-select: none;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(38,197,163,.13), transparent 35%),
+    radial-gradient(circle at 80% 20%, rgba(232,162,52,.08), transparent 30%),
+    linear-gradient(180deg, #061c1a, #0a2e2a 55%, #061c1a);
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.035) 2px, rgba(0,0,0,.035) 4px);
+}
+h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 700; }
+p, li, span, button, input, div { font-family: var(--font-main); font-weight: 500; }
+button { font: inherit; }
+
+/* ===================== SHARED COMPONENTS ===================== */
+.screen { position: relative; z-index: 1; min-height: 100vh; display: none; }
+.screen.active { display: flex; flex-direction: column; }
+.card {
+  position: relative;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 60px rgba(0,0,0,.25);
+}
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--teal-bright), transparent);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 30px;
+  border: 0;
+  cursor: pointer;
+  font-size: .88rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: transform .25s, box-shadow .25s, background .25s, opacity .25s;
+  position: relative;
+  overflow: hidden;
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.13), transparent);
+  transform: translateX(-100%);
+  transition: transform .5s;
+}
+.btn:hover::before { transform: translateX(100%); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--teal-light), var(--teal-bright));
+  color: var(--teal-deep);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  box-shadow: 0 8px 26px rgba(38,197,163,.25);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 34px rgba(38,197,163,.42); }
+.btn-secondary {
+  background: transparent;
+  color: var(--teal-bright);
+  border: 1px solid var(--border-strong);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+.btn-small { padding: 9px 16px; font-size: .7rem; letter-spacing: 1.4px; }
+.btn:disabled { opacity: .42; cursor: not-allowed; transform: none !important; }
+.label {
+  font-size: .66rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--teal-bright);
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  padding: 4px 10px;
+}
+.tag-red { color: var(--red-alert); background: rgba(224,82,82,.1); }
+.tag-green { color: var(--green-ok); background: rgba(76,175,125,.1); }
+.tag-teal { color: var(--teal-bright); background: rgba(38,197,163,.1); }
+.tag-amber { color: var(--amber-light); background: rgba(38,197,163,.1); }
+
+
+/* ===================== ANIMATIONS ===================== */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 8px rgba(38,197,163,.45); } 50% { box-shadow: 0 0 22px rgba(38,197,163,.9), 0 0 40px rgba(38,197,163,.24); } }
+@keyframes ripple { from { transform: scale(.2); opacity: 1; } to { transform: scale(2.8); opacity: 0; } }
+@keyframes blink { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .55; transform: scale(.86); } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes drift { from { transform: translateX(-30px); } to { transform: translateX(30px); } }
+
+/* ===================== HOME SCREEN ===================== */
+#home {
+  background: radial-gradient(ellipse at 20% 50%, rgba(26,122,110,.2), transparent 60%), linear-gradient(180deg,#061c1a,#0a2e2a 45%,#061c1a);
+}
+.home-header {
+  padding: 34px 54px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--border);
+  animation: fadeUp .6s both;
+}
+.logo { display: flex; gap: 14px; align-items: center; }
+.logo-icon {
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--teal-bright);
+  clip-path: polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  display: grid;
+  place-items: center;
+  background: rgba(38,197,163,.1);
+  animation: pulse 3s infinite;
+}
+.logo h1 { font-size: 1.35rem; letter-spacing: 4px; text-transform: uppercase; }
+.logo p { font-size: .64rem; letter-spacing: 3px; color: var(--dim); text-transform: uppercase; }
+.status { display: flex; gap: 20px; flex-wrap: wrap; }
+.status-item { font-size: .69rem; letter-spacing: 1.5px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-ok); box-shadow: 0 0 8px var(--green-ok); }
+.home-content { padding: 34px 54px 44px; display: flex; flex-direction: column; align-items: center; gap: 26px; }
+.hero { text-align: center; max-width: 760px; animation: fadeUp .6s .1s both; }
+.hero .eyebrow { font-size: .72rem; letter-spacing: 4px; text-transform: uppercase; color: var(--teal-bright); margin-bottom: 12px; }
+.hero h2 {
+  font-size: clamp(2.2rem, 4vw, 3.35rem);
+  line-height: 1.05;
+  background: linear-gradient(135deg, var(--text), var(--teal-bright));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero p { font-size: .95rem; line-height: 1.7; color: var(--muted); margin-top: 12px; }
+.map-area { width: 100%; max-width: 1000px; display: grid; grid-template-columns: 1fr 295px; gap: 18px; animation: fadeUp .6s .2s both; }
+.map-wrap { position: relative; min-height: 380px; overflow: hidden; background: rgba(10,46,42,.62); border: 1px solid var(--border); padding: 12px; }
+.map-wrap::before { content: "MANGROVES LOCATION"; position: absolute; top: 14px; left: 16px; z-index: 2; font-size: .62rem; letter-spacing: 3px; color: var(--dim); }
+.map-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(38,197,163,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(38,197,163,.06) 1px,transparent 1px); background-size: 44px 44px; }
+
+/* world map image goes here. */
+
+.world-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hotspot { position: absolute; z-index: 4; transform: translate(-50%,-50%); cursor: pointer; border: 0; background: transparent; color: inherit; }
+.hotspot-ring { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--teal-bright); display: grid; place-items: center; background: rgba(38,197,163,.15); animation: pulse 2s infinite; position: relative; transition: .2s; }
+.hotspot.active .hotspot-ring { transform: scale(1.18); border: 2px solid var(--amber-light); background: rgba(38,197,163,.3); }
+.hotspot:hover .hotspot-dot, .hotspot.active .hotspot-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+.hotspot-ring::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 1px solid rgba(93, 228, 30, 0.4); animation: ripple 2s infinite; }
+.hotspot-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-bright); }
+.hotspot-label { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 6px; white-space: nowrap; font-size: .63rem; letter-spacing: 1px; background: rgba(10,46,42,.95); border: 1px solid var(--border); padding: 3px 8px; color: var(--text); }
+.hotspot.site-borneo { left: 64%; top: 57%; }
+.hotspot.site-sundarbans { left: 58%; top: 45%; }
+.hotspot.site-mekong { left: 67%; top: 51%; }
+.hotspot.site-amazon { left: 32%; top: 63%; }
+.hotspot.site-everglades { left: 24%; top: 43%; }
+
+
+
+.site-panel { padding: 18px; min-height: 380px; }
+.site-panel h3 { font-size: 1rem; color: var(--teal-bright); margin: 8px 0 4px; }
+.site-panel .loc { font-size: .68rem; color: var(--dim); letter-spacing: 1px; margin-bottom: 14px; text-transform: uppercase; }
+.site-row { margin-bottom: 12px; }
+.site-row .k { font-size: .62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--teal-bright); margin-bottom: 3px; }
+.site-row .v { font-size: .82rem; line-height: 1.5; color: var(--muted); }
+.fact { border-left: 2px solid var(--amber); background: rgba(232,162,52,.08); padding: 10px; font-size: .78rem; line-height: 1.5; color: var(--muted); font-style: italic; }
+.mission-box { width: 100%; max-width: 1000px; padding: 28px 34px; animation: fadeUp .6s .3s both; }
+.mission-box h3 { font-size: .82rem; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 12px; }
+.overview-text { font-size: .9rem; line-height: 1.8; color: var(--muted); }
+.eco-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 18px 0 24px; }
+.eco-card { background: rgba(38,197,163,.07); border: 1px solid rgba(38,197,163,.18); padding: 12px 10px; display: flex; align-items: center; gap: 9px; font-size: .78rem; color: var(--text); }
+.eco-card span { font-size: 1.1rem; }
+.mission-title { font-family: var(--font-heading); font-size: 1.08rem; color: var(--text); margin-bottom: 8px; }
+.mission-text { font-size: .88rem; line-height: 1.75; color: var(--muted); }
+.mission-text ul { padding-left: 20px; margin: 8px 0 18px; }
+.cta { text-align: center; margin-top: 18px; }
+
+/* ===================== GAME SCREEN ===================== */
+#game { background: linear-gradient(180deg,#061c1a,#0a2e2a); overflow: hidden; height: 100vh; }
+.sim-header { position: relative; z-index: 50; background: rgba(6,28,26,.94); border-bottom: 1px solid var(--border); backdrop-filter: blur(12px); padding: 14px 24px; }
+.top-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.sim-title { font-size: .68rem; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); }
+.sim-title span { color: var(--teal-bright); }
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.budget-box { text-align: right; }
+.budget-label { font-size: .6rem; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+.budget-value { font-size: 1.15rem; color: var(--amber-light); }
+.dashboard { display: grid; grid-template-columns: repeat(6,1fr); gap: 10px; }
+.metric-top { display: flex; justify-content: space-between; gap: 6px; align-items: center; }
+.metric-label { font-size: .56rem; letter-spacing: 1.6px; text-transform: uppercase; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.metric-value { font-size: .74rem; color: var(--text); }
+.bar { height: 5px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; margin-top: 5px; }
+.fill { height: 100%; width: 50%; background: linear-gradient(90deg,var(--teal-light),var(--teal-bright)); transition: .5s; }
+.stage { position: relative; flex: 1; overflow: hidden; min-height: 0; touch-action: none; }
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, #081a2e 0%, #0d3050 28%, transparent 36%),
+    linear-gradient(180deg, #0a3d58 0%, #0d5a4a 43%, #0a4a38 62%, #1a3a2a 82%, #2a4a30 100%);
+}
+.water { position: absolute; left: 0; right: 0; bottom: 0; height: 42%; background: linear-gradient(180deg, rgba(13,90,74,.45), rgba(5,50,70,.9)); }
+.water::before { content: ""; position: absolute; left: -10%; right: -10%; top: 0; height: 8px; background: linear-gradient(90deg, transparent, rgba(38,197,163,.35), rgba(100,181,246,.25), transparent); animation: drift 5s ease-in-out infinite alternate; }
+/* game assets goes here. */
+.mangrove-line { position: absolute; left: 0; right: 0; bottom: 38%; min-height: 170px; pointer-events: none; }
+.tree { position: absolute; bottom: 0; font-size: clamp(2.3rem, 6vw, 5rem); filter: drop-shadow(0 12px 8px rgba(0,0,0,.28)); transition: filter .8s, opacity .8s; }
+.tree.dead { filter: grayscale(1) brightness(.55); opacity: .7; }
+.tree.healthy { filter: saturate(1.3) brightness(1.08); opacity: 1; }
+.pollution { position: absolute; pointer-events: none; transition: opacity .8s, transform .8s; }
+.oil-slick { bottom: 36%; left: 10%; width: 220px; height: 68px; background: radial-gradient(ellipse, rgba(25,14,8,.86) 0%, rgba(55,31,10,.54) 54%, transparent 100%); border-radius: 50%; }
+.trash-cluster { bottom: 34%; right: 7%; width: 135px; display: flex; flex-wrap: wrap; gap: 4px; font-size: 1.25rem; }
+.trash-cluster span { animation: float 3s ease-in-out infinite; filter: saturate(.6) brightness(.85); }
+.trash-cluster span:nth-child(2n) { animation-delay: .5s; }
+.net { bottom: 39%; left: 36%; width: 150px; height: 52px; border: 2px solid rgba(205,205,185,.55); border-radius: 0 0 36px 36px; }
+.wildlife { position: absolute; opacity: 0; transition: opacity .8s; animation: float 4s ease infinite; font-size: 1.35rem; }
+.wildlife.visible { opacity: 1; }
+.fish { bottom: 31%; left: 20%; }
+.birds { top: 30%; right: 20%; }
+.crabs { bottom: 39%; left: 45%; }
+.hint { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 20; background: rgba(6,28,26,.86); border: 1px solid var(--border); padding: 8px 18px; font-size: .66rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; pointer-events: none; text-align: center; }
+
+
+/* Boat cursor, collision range, and grouped threat items. */
+.stage { cursor: none; }
+.boat-wrapper {
+  position: fixed;
+  z-index: 45;
+  left: 50%;
+  top: 50%;
+  width: 94px;
+  height: 94px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  
+}
+.collection-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--teal-base); 
+  background: rgba(38,197,163,.05);
+  box-shadow: 0 0 18px rgba(38,197,163,.24);
+  animation: ringPulse 1.7s ease-in-out infinite;
+}
+.collection-ring.active {
+  border-color: var(--sand);
+  background: rgba(38,197,163,.14);
+  box-shadow: 0 0 30px rgba(100,255,180,.55);
+}
+.boat-cursor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  font-size: 3.15rem;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 8px 8px rgba(0,0,0,.36));
+  animation: boatBob 2.1s ease-in-out infinite;
+}
+.pollution-cluster {
+  position: absolute;
+  width: 128px;
+  height: 118px;
+  z-index: 9;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: opacity .45s ease, filter .45s ease, transform .45s ease;
+}
+.pollution-cluster.near {
+  transform: translate(-50%, -50%) scale(1.08);
+  filter: drop-shadow(0 0 18px rgba(100,255,180,.34));
+}
+.pollution-cluster.resolved {
+  opacity: .18;
+  filter: grayscale(80%);
+}
+.cluster-item {
+  position: absolute;
+  font-size: 1.85rem;
+  filter: drop-shadow(0 5px 5px rgba(0,0,0,.25));
+  animation: clusterFloat 2.8s ease-in-out infinite;
+}
+.cluster-item:nth-child(1) { left: 12px; top: 32px; }
+.cluster-item:nth-child(2) { left: 42px; top: 15px; animation-delay: .2s; }
+.cluster-item:nth-child(3) { left: 78px; top: 34px; animation-delay: .4s; }
+.cluster-item:nth-child(4) { left: 26px; top: 68px; animation-delay: .6s; }
+.cluster-item:nth-child(5) { left: 62px; top: 70px; animation-delay: .8s; }
+.cluster-item:nth-child(6) { left: 92px; top: 58px; animation-delay: 1s; }
+.oil-patch {
+  width: 56px;
+  height: 34px;
+  border-radius: 50% 44% 55% 40%;
+  background: radial-gradient(circle at 35% 35%, #424242, #070707);
+  box-shadow: 0 0 14px rgba(0,0,0,.4);
+}
+.mud-patch {
+  width: 34px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #8f5b2a, #4f2f16);
+}
+.threat-pos-1 { left: 18%; top: 62%; }
+.threat-pos-2 { left: 76%; top: 67%; }
+.threat-pos-3 { left: 43%; top: 59%; }
+.threat-pos-4 { left: 64%; top: 76%; }
+.threat-pos-5 { left: 54%; top: 52%; }
+.threat-pos-6 { left: 28%; top: 74%; }
+.threat-pos-7 { left: 82%; top: 51%; }
+.threat-pos-8 { left: 38%; top: 48%; }
+@keyframes clusterFloat { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-6px) rotate(4deg); } }
+@keyframes ringPulse { 0%,100% { transform: scale(.92); opacity: .65; } 50% { transform: scale(1.05); opacity: 1; } }
+@keyframes boatBob { 0%,100% { margin-top: 0; } 50% { margin-top: -5px; } }
+
+
+/* ===================== INCIDENT MARKERS  ===================== */
+.incident-marker {
+  position: absolute;
+  cursor: pointer;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 0;
+  background: none;
+  color: inherit;
+}
+.marker-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(224,82,82,0.2);
+  border: 2px solid var(--red-alert);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: blink 1.5s ease infinite;
+  transition: all 0.2s;
+  cursor: pointer;
+  color: var(--red-alert);
+}
+.marker-btn svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+  stroke: currentColor;
+}
+.incident-marker:hover .marker-btn {
+  background: rgba(224,82,82,0.4);
+  transform: scale(1.15);
+}
+.incident-marker.resolved .marker-btn {
+  background: rgba(76,175,125,0.2);
+  border-color: var(--green-ok);
+  animation: none;
+  opacity: 0.6;
+  color: var(--green-ok);
+}
+.marker-num {
+  font-size: 0.65rem;
+  color: var(--red-alert);
+  margin-top: 3px;
+  background: rgba(6,28,26,0.9);
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+.incident-marker.resolved .marker-num {
+  color: var(--green-ok);
+}
+.incident-marker.near .marker-btn {
+  box-shadow: 0 0 0 8px rgba(100,255,180,.16),0 0 24px rgba(100,255,180,.45);
+  border-color: var(--green-bright);
+}
+
+
+
+/*
+.tree-pos-1 { left: 4%; font-size: 2.5rem; }
+.tree-pos-2 { left: 11%; font-size: 2.95rem; }
+.tree-pos-3 { left: 18%; font-size: 3.4rem; }
+.tree-pos-4 { left: 25%; font-size: 3.85rem; }
+.tree-pos-5 { left: 33%; font-size: 2.5rem; }
+.tree-pos-6 { left: 41%; font-size: 2.95rem; }
+.tree-pos-7 { left: 49%; font-size: 3.4rem; }
+.tree-pos-8 { left: 58%; font-size: 3.85rem; }
+.tree-pos-9 { left: 67%; font-size: 2.5rem; }
+.tree-pos-10 { left: 76%; font-size: 2.95rem; }
+.tree-pos-11 { left: 86%; font-size: 3.4rem; }
+.tree-pos-12 { left: 94%; font-size: 3.85rem; }
+*/
+/* ===================== RED WARNING POPUP===================== */
+.incident-pos-1 { left: 18%; top: 58%; }
+.incident-pos-2 { left: 76%; top: 63%; }
+.incident-pos-3 { left: 43%; top: 55%; }
+.incident-pos-4 { left: 64%; top: 72%; }
+.incident-pos-5 { left: 54%; top: 48%; }
+.incident-pos-6 { left: 28%; top: 70%; }
+.incident-pos-7 { left: 82%; top: 47%; }
+.incident-pos-8 { left: 38%; top: 44%; }
+
+
+.marker-state { margin-top: 3px; font-size: .54rem; letter-spacing: 1.4px; text-transform: uppercase; color: var(--red-alert); background: rgba(6,28,26,.9); padding: 1px 5px; }
+.incident-marker.resolved .marker-state { color: var(--green-ok); }
+
+/* ===================== INCIDENT POPUP ===================== */
+.modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(3,17,15,.78); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 18px; overflow-y: auto; }
+.modal-overlay.open { display: flex; }
+.incident-modal { width: min(1000px, 96vw); background: rgba(10,46,42,.98); border: 1px solid var(--border-strong); box-shadow: 0 25px 90px rgba(0,0,0,.55),0 0 40px rgba(38,197,163,.15); }
+.modal-head { background: rgba(13,74,66,.9); border-bottom: 1px solid var(--border); padding: 20px 24px; display: flex; justify-content: space-between; gap: 16px; }
+.modal-head .type { font-size: .65rem; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 6px; }
+.modal-head h2 { font-size: 1.22rem; color: var(--text); }
+.modal-close { width: 36px; height: 36px; background: rgba(6,28,26,.55); border: 1px solid var(--border); color: var(--muted); cursor: pointer; font-size: 1.1rem; }
+.modal-close:hover { color: var(--red-alert); border-color: var(--red-alert); }
+.modal-body { padding: 22px 24px; }
+.observation { font-size: .86rem; line-height: 1.65; color: var(--muted); border-left: 3px solid var(--teal-bright); padding-left: 13px; margin-bottom: 14px; }
+.question { font-size: .92rem; color: var(--amber-light); margin-bottom: 15px; }
+.options { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.option-card { width: 100%; text-align: left; background: #0d3c35; border: 2px solid transparent; padding: 15px 16px; cursor: pointer; transition: .2s; color: var(--text); min-height: 230px; }
+.option-card:hover:not(:disabled) { border-color: var(--teal-bright); background: #0f4540; }
+.option-card.selected { border-color: var(--teal-glow); background: #0f4a44; }
+.option-card:disabled { opacity: .48; cursor: not-allowed; }
+.option-title { font-family: var(--font-heading); font-size: .88rem; margin-bottom: 5px; color: #fff; }
+.option-cost { font-size: .75rem; color: var(--amber-light); margin-bottom: 7px; }
+.option-impact { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+.impact-tag { font-size: .58rem; padding: 2px 7px; border: 1px solid rgba(76,175,125,.3); color: var(--green-ok); background: rgba(76,175,125,.12); }
+.impact-tag.neg { color: var(--red-alert); border-color: rgba(224,82,82,.35); background: rgba(224,82,82,.12); }
+.option-desc { font-size: .75rem; line-height: 1.45; color: var(--muted); margin-top: 7px; }
+.insufficient { display: inline-block; background: var(--red-alert); color: #fff; font-size: .57rem; letter-spacing: 1px; padding: 2px 6px; margin-bottom: 6px; }
+.modal-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 24px; border-top: 1px solid rgba(38,197,163,.15); }
+.analysis-preview { font-size: .74rem; color: var(--dim); line-height: 1.5; }
+
+/* ===================== LEARNING RESULT POPUP ===================== */
+.result-popup { position: absolute; left: 50%; right: auto; bottom: 18px; transform: translateX(-50%); width: min(650px, 92vw); max-height: 45vh; overflow: auto; z-index: 60; background: rgba(6,28,26,.96); border: 1px solid var(--border-strong); box-shadow: 0 18px 60px rgba(0,0,0,.45),0 0 24px rgba(38,197,163,.14); padding: 20px 22px 18px; border-radius: 12px; display: none; }
+.result-popup.show { display: block; animation: fadeUp .25s; }
+.result-close { position: absolute; top: 10px; right: 12px; width: 28px; height: 28px; border: 1px solid rgba(38,197,163,.3); background: rgba(10,46,42,.75); color: var(--text); cursor: pointer; line-height: 1; }
+.result-close:hover { color: var(--teal-bright); border-color: var(--teal-bright); }
+.result-popup h3 { font-size: 1rem; color: var(--teal-bright); margin: 10px 0 8px; padding-right: 26px; }
+.result-popup p { font-size: .8rem; line-height: 1.55; color: var(--muted); margin-top: 7px; }
+.result-status-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.result-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+
+/* ===================== RESTORATION REPORT ===================== */
+
+
+.report-box { width: min(900px, 95vw); background: rgba(10,46,42,.98); border: 1px solid var(--border-strong); box-shadow: 0 25px 90px rgba(0,0,0,.58); padding: 28px; }
+.report-title { font-size: 1.7rem; color: var(--teal-bright); margin: 8px 0; }
+.classification { font-size: 2rem; color: var(--amber-light); margin-bottom: 8px; }
+.report-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin: 16px 0; }
+.report-card { background: rgba(38,197,163,.07); border: 1px solid rgba(38,197,163,.18); padding: 12px; }
+.report-card .k { font-size: .61rem; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 4px; }
+.report-card .v { font-size: .86rem; color: var(--text); }
+.history { max-height: 155px; overflow: auto; border: 1px solid rgba(38,197,163,.12); padding: 10px; margin-top: 12px; }
+.history p { font-size: .75rem; line-height: 1.45; color: var(--muted); margin: 6px 0; }
+
+
+/* ===================== MOBILE RESPONSIVE ===================== */
+@media (max-width: 900px) {
+  html, body { min-height: 100%; overflow-x: hidden; }
+  body { -webkit-text-size-adjust: 100%; }
+  #game { height: auto; min-height: 100svh; overflow: visible; }
+
+  .home-header { padding: 22px; align-items: flex-start; flex-direction: column; }
+  .home-content { padding: 22px; gap: 20px; }
+  .map-area { grid-template-columns: 1fr; }
+  .site-panel { min-height: auto; }
+  .eco-grid { grid-template-columns: 1fr 1fr; }
+
+  .sim-header { padding: 12px; position: sticky; top: 0; }
+  .top-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .header-actions { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+  .dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .budget-box { text-align: left; }
+  .metric-label { white-space: normal; }
+
+  .stage { height: calc(100svh - 190px); min-height: 430px; max-height: 720px; flex: none; cursor: default; }
+  .boat-wrapper { width: 78px; height: 78px; }
+  .boat-cursor { font-size: 2.55rem; }
+  .pollution-cluster { width: 106px; height: 98px; }
+  .cluster-item { font-size: 1.55rem; }
+  .incident-marker { transform: translate(-50%, -50%) scale(.92); }
+  .marker-num { font-size: .56rem; max-width: 88px; overflow: hidden; text-overflow: ellipsis; }
+  .hint { width: calc(100% - 24px); bottom: 10px; padding: 8px 10px; }
+
+  .modal-overlay { align-items: flex-start; padding: 12px; }
+  .incident-modal, .report-box { width: 100%; max-height: calc(100svh - 24px); overflow: auto; }
+  .modal-head, .modal-body, .modal-foot { padding-left: 16px; padding-right: 16px; }
+  .options { grid-template-columns: 1fr; }
+  .option-card { min-height: auto; }
+  .modal-foot { flex-direction: column; align-items: stretch; }
+  .report-grid { grid-template-columns: 1fr; }
+
+  .result-popup { position: fixed; bottom: max(10px, env(safe-area-inset-bottom)); width: calc(100vw - 24px); max-height: 50svh; padding: 18px 16px; }
+}
+
+@media (max-width: 540px) {
+  .hero h2 { font-size: clamp(1.8rem, 10vw, 2rem); }
+  .hero p, .overview-text, .mission-text { font-size: .82rem; line-height: 1.65; }
+  .logo h1 { font-size: 1.05rem; letter-spacing: 2.4px; }
+  .logo p { font-size: .56rem; letter-spacing: 2px; }
+  .map-wrap { min-height: 300px; }
+  .hotspot-label { display: none; }
+  .hotspot-ring { width: 24px; height: 24px; }
+  .eco-grid { grid-template-columns: 1fr; }
+  .btn { width: 100%; padding: 12px 18px; }
+  .dashboard { grid-template-columns: 1fr; }
+  .header-actions { flex-direction: column; align-items: stretch; }
+  .stage { height: calc(100svh - 245px); min-height: 360px; }
+  .boat-wrapper { width: 68px; height: 68px; }
+  .boat-cursor { font-size: 2.2rem; }
+  .pollution-cluster { width: 88px; height: 82px; }
+  .cluster-item { font-size: 1.25rem; }
+  .incident-marker { transform: translate(-50%, -50%) scale(.82); }
+  .marker-btn { width: 32px; height: 32px; }
+  .result-actions, .report-actions { flex-direction: column; }
+  .report-title { font-size: 1.3rem; }
+  .classification { font-size: 1.45rem; }
+}
+
+@media (max-width: 380px) {
+  .home-header, .home-content { padding-left: 16px; padding-right: 16px; }
+  .map-wrap { min-height: 260px; }
+  .stage { min-height: 330px; }
+  .marker-num { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== HOME SCREEN ===================== -->
+<section id="home" class="screen active" aria-label="Mangrove Rescue Home">
+  <header class="home-header">
+    <div class="logo">
+      <!-- logo asset goes here. -->
+      <div class="logo-icon" aria-hidden="true">🌿</div>
+      <div>
+        <h1>Mangrove Rescue</h1>
+        <p>	An Educational Web-Based Game</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="home-content">
+    <section class="hero">
+      <div class="eyebrow">Every Decision Shapes the Coast</div>
+      <h2>Explore. Learn. Restore.</h2>
+      <p>Discover the importance of mangrove ecosystems through interactive exploration and environmental decision-making. 
+        Learn how conservation actions can shape the future of coastal habitats and communities.</p>
+    </section>
+
+    <section class="map-area" aria-label="World map site selector">
+      <div class="map-wrap card">
+        <div class="map-grid"></div>
+        <!-- world map image/background here. -->
+        <svg class="world-svg" viewBox="0 0 900 420" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M65 175 C130 85 235 105 290 148 C340 188 303 270 210 281 C120 292 37 250 65 175Z" fill="rgba(38,197,163,.12)" stroke="rgba(38,197,163,.25)"/>
+          <path d="M410 118 C510 68 650 85 730 145 C805 200 760 318 630 318 C510 316 380 260 410 118Z" fill="rgba(38,197,163,.11)" stroke="rgba(38,197,163,.25)"/>
+          <path d="M380 285 C450 245 550 250 590 300 C620 338 555 375 470 365 C405 358 335 320 380 285Z" fill="rgba(232,162,52,.08)" stroke="rgba(38,197,163,.18)"/>
+          <path d="M155 105 C200 60 275 75 318 108" fill="none" stroke="rgba(38,197,163,.12)"/>
+          <path d="M622 97 C710 80 805 128 840 195" fill="none" stroke="rgba(38,197,163,.12)"/>
+        </svg>
+        <button class="hotspot site-borneo active" data-site="borneo"><span class="hotspot-label">Borneo</span><span class="hotspot-ring"><span class="hotspot-dot"></span></span></button>
+        <button class="hotspot site-sundarbans" data-site="sundarbans"><span class="hotspot-label">Sundarbans</span><span class="hotspot-ring"><span class="hotspot-dot"></span></span></button>
+        <button class="hotspot site-mekong" data-site="mekong"><span class="hotspot-label">Mekong Delta</span><span class="hotspot-ring"><span class="hotspot-dot"></span></span></button>
+        <button class="hotspot site-amazon" data-site="amazon"><span class="hotspot-label">Amazon Mangroves</span><span class="hotspot-ring"><span class="hotspot-dot"></span></span></button>
+        <button class="hotspot site-everglades" data-site="everglades"><span class="hotspot-label">Everglades</span><span class="hotspot-ring"><span class="hotspot-dot"></span></span></button>
+      </div>
+
+      <aside class="site-panel card" id="sitePanel">
+        <span class="tag tag-amber">Selected Location</span>
+        <h3 id="siteName">Borneo Coastal Mangrove</h3>
+        <div class="loc" id="siteLocation"><span>📍</span>Sabah and Sarawak (Malaysia),  Kalimantan (Indonesia) and Brunei</div>
+        <div class="site-row"><div class="k"><span>🌿</span>Importance</div><div class="v" id="siteMission">Critical tropical mangrove habitat supporting diverse wildlife in Southeast Asia, such as Proboscis monkeys.</div></div>
+        <div class="site-row"><div class="k"><span>⚠️</span>Primary Threat</div><div class="v" id="siteThreat">Palm oil plantation expansion and coastal deforestation.</div></div>
+        <div class="site-row"><div class="k"><span>💡</span>Field Insight</div><div class="v"></div></div>
+
+        <div class="fact" id="siteFact">The Kinabatangan River in Sabah is a premier international mangrove and riverine tourism destination.</div>
+      </aside>
+    </section>
+
+    <section class="mission-box card">
+      <h3>Ecosystem Overview</h3>
+      <p class="overview-text">Mangrove forests are vital coastal ecosystems that protect shorelines, sustain marine biodiversity, 
+        improve water quality, and store massive amounts of carbon. Despite their importance, mangroves are increasingly threatened by pollution, 
+        habitat loss, and unsustainable human activities, making conservation and restoration efforts essential.</p>
+        <br>
+        <h4 style="color: var(--teal-glow);">Key Functions of Mangroves</h3>
+      <div class="eco-grid">
+        <div class="eco-card"><span>🌊</span>Coastline Protection</div>
+        <div class="eco-card"><span>🐟</span>Marine Biodiversity</div>
+        <div class="eco-card"><span>🌿</span>Carbon Storage</div>
+        <div class="eco-card"><span>🏘️</span>Community Support</div>
+        <div class="eco-card"><span>🔬</span>Erosion Control</div>
+        <div class="eco-card"><span>💧</span>Water Filtration</div>
+      </div>
+      <h3>Mission Overview</h3>
+      <div class="mission-title" style="color:var(--teal-glow);">Your mission is to restore a threatened mangrove ecosystem.</div>
+      <div class="mission-text">Respond to environmental incidents, manage limited restoration funds, 
+        and make critical conservation decisions. Every choice has consequences that will shape the 
+        future health of the ecosystem and the communities that depend on it.</div>
+      <div class="cta"><button id="beginBtn" class="btn btn-primary">Begin Mission</button></div>
+    </section>
+  </main>
+</section>
+
+<!-- ===================== GAME SCREEN ===================== -->
+<section id="game" class="screen" aria-label="Mangrove Rescue Game">
+  <header class="sim-header">
+    <div class="top-row">
+      <div class="sim-title">MANGROVE RESCUE / <span id="activeSiteName">Mangrove Restoration Zone</span></div>
+      <div class="header-actions">
+        
+        <div class="metric"><div class="metric-top"><span class="metric-label">Progress</span><span id="progressVal" class="metric-value">0/8</span></div><div class="bar"><div id="progressFill" class="fill"></div></div></div>
+      
+      </div>
+    </div>
+    <!-- header -->
+    <div class="dashboard">
+      <div class="budget-box"><div class="budget-label">Restoration Budget</div><div id="budgetVal" class="budget-value">RM 120,000</div></div>
+
+      
+      <div class="metric"><div class="metric-top"><span class="metric-label">Biodiversity</span><span id="biodiversityVal" class="metric-value">50</span></div><div class="bar"><div id="biodiversityFill" class="fill"></div></div></div>
+      <div class="metric"><div class="metric-top"><span class="metric-label">Water Quality</span><span id="waterQualityVal" class="metric-value">50</span></div><div class="bar"><div id="waterQualityFill" class="fill"></div></div></div>
+      <div class="metric"><div class="metric-top"><span class="metric-label">Shoreline</span><span id="shorelineVal" class="metric-value">50</span></div><div class="bar"><div id="shorelineFill" class="fill"></div></div></div>
+      <div class="metric"><div class="metric-top"><span class="metric-label">Carbon</span><span id="carbonVal" class="metric-value">50</span></div><div class="bar"><div id="carbonFill" class="fill"></div></div></div>
+      <button id="exitMissionBtn" class="btn btn-secondary btn-small">Back</button>
+      <button id="viewReportBtn" class="btn btn-secondary btn-small">View Report</button></div>
+    </header>
+
+  <main class="stage" id="stage">
+    <div class="scene">
+      <div class="water"></div>
+      <div class="mangrove-line" id="mangroveLine"></div>
+      <div class="pollution-cluster threat-pos-1" data-cluster-id="1">
+        <span class="cluster-item oil-patch"></span><span class="cluster-item oil-patch"></span><span class="cluster-item oil-patch"></span><span class="cluster-item oil-patch"></span>
+      </div>
+      <div class="pollution-cluster threat-pos-2" data-cluster-id="2">
+        <span class="cluster-item">🧴</span><span class="cluster-item">🥤</span><span class="cluster-item">🧴</span><span class="cluster-item">🛍️</span><span class="cluster-item">🛍️</span><span class="cluster-item">🍱</span>
+      </div>
+      <div class="pollution-cluster threat-pos-3" data-cluster-id="3">
+        <span class="cluster-item">🕸️</span><span class="cluster-item">🕸️</span><span class="cluster-item">🕸️</span><span class="cluster-item">🪵</span><span class="cluster-item">🥤</span>
+      </div>
+      <div class="pollution-cluster threat-pos-4" data-cluster-id="4">
+        <span class="cluster-item mud-patch"></span><span class="cluster-item mud-patch"></span><span class="cluster-item mud-patch"></span><span class="cluster-item mud-patch"></span>
+      </div>
+      <div class="pollution-cluster threat-pos-5" data-cluster-id="5">
+        <span class="cluster-item">🛢️</span><span class="cluster-item">🛢️</span><span class="cluster-item">☣️</span><span class="cluster-item">🛢️</span>
+      </div>
+      <div class="pollution-cluster threat-pos-6" data-cluster-id="6">
+        <span class="cluster-item">🌿</span><span class="cluster-item">🌿</span><span class="cluster-item">🌿</span><span class="cluster-item">🌿</span>
+      </div>
+      <div class="pollution-cluster threat-pos-7" data-cluster-id="7">
+        <span class="cluster-item">🪵</span><span class="cluster-item">🪵</span><span class="cluster-item">🪵</span><span class="cluster-item">🪓</span>
+      </div>
+      <div class="pollution-cluster threat-pos-8" data-cluster-id="8">
+        <span class="cluster-item">🏗️</span><span class="cluster-item">🚧</span><span class="cluster-item">🏗️</span><span class="cluster-item">🧱</span>
+      </div>
+      <div class="boat-wrapper" id="boatWrapper">
+        <div class="collection-ring" id="collectionRing"></div>
+        <div class="boat-cursor" id="boatCursor">🚤</div>
+      </div>
+      <div class="wildlife fish" id="fishGroup">🐟 🐠 🐟</div>
+      <div class="wildlife birds" id="birdGroup">🕊️ 🐦</div>
+      <div class="wildlife crabs" id="crabGroup">🦀 🦀</div>
+      <div id="incidentLayer"></div>
+    </div>
+    
+
+    <aside id="resultPopup" class="result-popup" aria-live="polite">
+      <button id="resultCloseBtn" class="result-close" aria-label="Close learning result">×</button>
+
+      <h3 id="resultTitle">Decision Outcome</h3>
+      <p><strong>Environmental Outcome:</strong> <span id="outcomeText"></span></p>
+      <p><strong>Key Takeaway:</strong> <span id="takeawayText"></span></p>
+      <p></p>
+        <div class="result-status-row">
+        <span id="resultIncidentState" class="tag tag-green">RESOLVED</span>
+        <span id="resultCostTag" class="tag tag-teal">RM 0</span>
+      </div>
+      <div class="result-actions">
+        <!-- <button id="resultReportBtn" class="btn btn-secondary btn-small"></button>  -->
+        <button id="resultContinueBtn" class="btn btn-primary btn-small">Continue Mission</button>
+      </div>
+    </aside>
+  </main>
+</section>
+
+<!-- ===================== INCIDENT MODAL ===================== -->
+<div id="incidentModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Incident decision popup">
+  <section class="incident-modal">
+    <header class="modal-head">
+      <div>
+        <div id="incidentType" class="type">ACTIVE INCIDENT</div>
+        <h2 id="incidentTitle">Incident Title</h2>
+      </div>
+      <button id="closeIncidentBtn" class="modal-close" aria-label="Close incident popup">×</button>
+    </header>
+    <div class="modal-body">
+      <p id="incidentObservation" class="observation"></p>
+      <div class="question">Choose the most suitable restoration response:</div>
+      <div id="optionList" class="options"></div>
+    </div>
+    <footer class="modal-foot">
+      <div id="analysisPreview" class="analysis-preview">Select a response to preview its ecological trade-off.</div>
+      <button id="confirmDecisionBtn" class="btn btn-primary" disabled>Confirm</button>
+    </footer>
+  </section>
+</div>
+
+<!-- ===================== RESTORATION REPORT MODAL ===================== -->
+<div id="reportModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Restoration report popup">
+  <section class="report-box">
+    <button id="closeReportBtn" class="modal-close" aria-label="Close restoration report">×</button>
+    <div class="label">Restoration Report</div>
+    <h2 class="report-title">Borneo Mangrove Zone</h2>
+    <h3 id="classification" class="classification">IN PROGRESS</h3>
+    <p id="reportSummary" class="observation">Mission has started. Resolve incidents to generate a complete restoration report.</p>
+    <div class="report-grid">
+      <div class="report-card"><div class="k">Incidents Resolved</div><div id="reportResolved" class="v">0 / 8</div></div>
+      <div class="report-card"><div class="k">Budget Remaining</div><div id="reportBudget" class="v">RM 120,000</div></div>
+      <div class="report-card"><div class="k">Ecosystem Score</div><div id="reportScore" class="v">50</div></div>
+      <div class="report-card"><div class="k">Status</div><div id="reportStatus" class="v">Active Mission</div></div>
+    </div>
+    <div class="history" id="decisionHistory"><p>No decisions made yet.</p></div>
+    <div class="result-actions report-actions">
+      <button id="restartBtn" class="btn btn-secondary btn-small">Restart Mission</button>
+      <button id="closeReportBtn2" class="btn btn-primary btn-small">Back to Mission</button>
+      
+    </div>
+  </section>
+</div>
+
+<script>
+/* =========================================================
+   MANGROVE RESCUE — GAME LOGIC
+
+   ========================================================= */
+
+'use strict';
+
+/* ===================== DATA ===================== */
+const sites = {
+  borneo: {
+    name: 'Borneo Mangroves',
+    location: 'Sabah and Sarawak (Malaysia),  Kalimantan (Indonesia) and Brunei',
+    threat: 'Palm oil plantation expansion and coastal deforestation. ',
+    mission: 'Critical tropical mangrove habitat supporting diverse wildlife in Southeast Asia, such as Proboscis monkeys.',
+    fact: 'The Kinabatangan River in Sabah is a premier international mangrove and riverine tourism destination.'
+  },
+  sundarbans: {
+    name: 'Sundarbans Mangroves',
+    location: 'Sundarbans, Ganges delta between India and Bangladesh',
+    threat: ' Industrial development, deforestation and climate change.',
+    mission: 'World\'s largest mangrove forest; supports single largest tiger population adapted to amphibious life.',
+    fact: 'Spanning  10,000 km², the Surdarbans is a UNESCO World Heritage Site formed by confluence of Ganges, Brahmaputra, and Meghna rivers.'
+  },
+  mekong: {
+    name: 'Mekong Delta Mangroves',
+    location: 'Mekong Delta, Vietnam',
+    threat: 'Sea-level rise and conversion into commercial shrimp farming.',
+    mission: 'Protects coasts from soil erosion and strong waves; supplies seafood and accumulates blue carbon.',
+    fact: 'Eco-certified, mangrove-friendly shrimp farming initiatives are actively restoring forests to safeguard coastal communities.'
+  },
+  amazon: {
+    name: 'Amazon Mangroves',
+    location: 'Amazon River mouth, North coast of Brazil, Brazil',
+    threat: 'Climate change and coastal development.',
+    mission: 'Form the world\'s longest continuous coastal belt of mangroves; vital breeding grounds for marine life, including the endangered Atlantic Goliath Grouper. ',
+    fact: 'Spanning ~7,800 km², Brazil holds nearly 10% of the world\'s mangroves, making them crucial "blue guardians" for carbon storage.'
+  },
+  everglades: {
+    name: 'Everglades Mangroves',
+    location: 'Everglades National Park, Southern Florida, USA',
+    threat: 'Climate change causing sea-level rise and saltwater intrusion.',
+    mission: 'Largest mangrove ecosystem in the Western Hemisphere; major breeding ground for wading birds in North America.',
+    fact: 'Contiguous mangrove forests stretch from freshwater marshes seaward to Florida Bay and Gulf of Mexico.'
+  }
+};
+
+const incidents = [
+  {
+    id: 1,
+    title: 'Oil Spill Near Mangrove Roots',
+    x: 18,
+    y: 58,
+    observation: 'A small boat accident released oil near the mangrove roots. If ignored, the oil may reduce oxygen exchange and damage young root systems.',
+    options: [
+      { title: 'Immediate Professional Cleanup', cost: 26000, desc: 'Deploy trained cleanup team, absorbent booms, and safe disposal.', impacts: { biodiversity: 8, waterQuality: 15, shoreline: 4, carbon: 3 }, outcome: 'Professional cleanup removed most of the oil before it reached mangrove roots.', takeaway: 'Early intervention can prevent long-term ecosystem damage and reduce restoration costs.' },
+      { title: 'Community Manual Cleanup', cost: 12000, desc: 'Use volunteers for surface cleanup and basic containment.', impacts: { biodiversity: 4, waterQuality: 7, shoreline: 1, carbon: 1 }, outcome: 'Community cleanup reduced visible oil, but some residue remained in the water.', takeaway: 'Community action helps, but hazardous spills still need proper equipment and trained support.' },
+      { title: 'Wait for Natural Breakdown', cost: 0, desc: 'Avoid spending budget and let tides disperse the spill.', impacts: { biodiversity: -10, waterQuality: -14, shoreline: -3, carbon: -2 }, outcome: 'The oil spread into the root zone and lowered habitat quality.', takeaway: 'Doing nothing may look cheap, but delayed action often creates bigger ecological damage.' }
+    ]
+  },
+  {
+    id: 2,
+    title: 'Plastic Waste Accumulation',
+    x: 76,
+    y: 63,
+    observation: 'Plastic bottles and packaging are trapped around the tidal channel. Wildlife may ingest fragments or become entangled.',
+    options: [
+      { title: 'Install Trash Trap + Cleanup', cost: 18000, desc: 'Remove existing waste and install a floating trash trap upstream.', impacts: { biodiversity: 10, waterQuality: 10, shoreline: 2, carbon: 1 }, outcome: 'The trash trap reduced new plastic entering the mangrove channel.', takeaway: 'Waste prevention works best when cleanup is paired with source control.' },
+      { title: 'One-Day Cleanup Campaign', cost: 8000, desc: 'Organize a quick community cleanup event.', impacts: { biodiversity: 5, waterQuality: 4, shoreline: 1, carbon: 0 }, outcome: 'The area looked cleaner, but plastic began returning after high tide.', takeaway: 'One-time cleanup is useful, but repeated pollution needs long-term prevention.' },
+      { title: 'Post Warning Signs Only', cost: 2000, desc: 'Install signs asking visitors not to litter.', impacts: { biodiversity: 1, waterQuality: 1, shoreline: 0, carbon: 0 }, outcome: 'Signs raised awareness, but most existing waste stayed in the habitat.', takeaway: 'Awareness matters, but education should be supported by physical waste management.' }
+    ]
+  },
+  {
+    id: 3,
+    title: 'Ghost Net Entanglement Zone',
+    x: 43,
+    y: 55,
+    observation: 'An abandoned fishing net is caught between mangrove roots and shallow water. Fish, crabs, and birds may become trapped.',
+    options: [
+      { title: 'Diver-Assisted Net Removal', cost: 20000, desc: 'Safely remove the net without cutting roots or disturbing wildlife.', impacts: { biodiversity: 13, waterQuality: 4, shoreline: 3, carbon: 1 }, outcome: 'The ghost net was removed with minimal root disturbance.', takeaway: 'Careful removal protects wildlife while avoiding extra damage to mangrove roots.' },
+      { title: 'Cut Visible Sections Only', cost: 6000, desc: 'Quickly cut the exposed sections from the shoreline.', impacts: { biodiversity: 4, waterQuality: 1, shoreline: -1, carbon: 0 }, outcome: 'Some net sections were removed, but hidden pieces remained underwater.', takeaway: 'Partial removal can reduce immediate risk but may leave long-term hazards behind.' },
+      { title: 'Leave It Until Low Tide', cost: 0, desc: 'Delay action and wait for a more convenient tide window.', impacts: { biodiversity: -9, waterQuality: -2, shoreline: -2, carbon: 0 }, outcome: 'More animals entered the net while the team waited.', takeaway: 'Delays can turn manageable incidents into serious wildlife threats.' }
+    ]
+  },
+  {
+    id: 4,
+    title: 'Eroding Shoreline Edge',
+    x: 64,
+    y: 72,
+    observation: 'Wave action is undercutting the shoreline. Seedlings may fail if the bank continues collapsing.',
+    options: [
+      { title: 'Living Shoreline Barrier', cost: 24000, desc: 'Use natural materials and planting to reduce wave energy.', impacts: { biodiversity: 8, waterQuality: 3, shoreline: 16, carbon: 6 }, outcome: 'The living shoreline slowed erosion and created habitat for small organisms.', takeaway: 'Nature-based coastal protection can stabilize shorelines while improving biodiversity.' },
+      { title: 'Sandbag Reinforcement', cost: 10000, desc: 'Use temporary sandbags at the most exposed edge.', impacts: { biodiversity: 1, waterQuality: 0, shoreline: 7, carbon: 1 }, outcome: 'Sandbags reduced short-term erosion but did not restore habitat structure.', takeaway: 'Temporary barriers can buy time, but they are not a full ecosystem restoration strategy.' },
+      { title: 'Plant Seedlings Only', cost: 9000, desc: 'Plant mangrove seedlings without wave protection.', impacts: { biodiversity: 2, waterQuality: 0, shoreline: 2, carbon: 3 }, outcome: 'Many seedlings struggled because erosion continued around them.', takeaway: 'Planting works best when physical site conditions are stable enough for survival.' }
+    ]
+  },
+  {
+    id: 5,
+    title: 'Declining Water Quality',
+    x: 54,
+    y: 48,
+    observation: 'Runoff is making the water cloudy and nutrient-rich. This may stress young mangroves and reduce nursery habitat quality.',
+    options: [
+      { title: 'Buffer Zone + Water Testing', cost: 22000, desc: 'Create a vegetation buffer and monitor water quality trends.', impacts: { biodiversity: 7, waterQuality: 16, shoreline: 4, carbon: 3 }, outcome: 'The buffer zone filtered runoff and water quality improved over time.', takeaway: 'Mangroves help filter water, but upstream pollution control strengthens the whole system.' },
+      { title: 'Water Testing Only', cost: 5000, desc: 'Collect data but delay physical intervention.', impacts: { biodiversity: 0, waterQuality: 3, shoreline: 0, carbon: 0 }, outcome: 'Testing identified the issue, but the pollution source continued.', takeaway: 'Monitoring is useful, but data needs to lead to action.' },
+      { title: 'Dilute with Pumped Water', cost: 13000, desc: 'Pump cleaner water into the area for fast dilution.', impacts: { biodiversity: 1, waterQuality: 4, shoreline: -1, carbon: 0 }, outcome: 'Dilution gave a short-term improvement but did not solve the runoff problem.', takeaway: 'Quick fixes may hide symptoms without addressing the actual pollution source.' }
+    ]
+  },
+  {
+    id: 6,
+    title: 'Seedling Mortality Patch',
+    x: 28,
+    y: 70,
+    observation: 'A planted area has low seedling survival. The spacing, species choice, or tidal height may be unsuitable.',
+    options: [
+      { title: 'Replant with Site-Matched Species', cost: 21000, desc: 'Match species to tidal level and improve spacing.', impacts: { biodiversity: 10, waterQuality: 2, shoreline: 6, carbon: 10 }, outcome: 'Seedling survival improved after species and spacing were adjusted.', takeaway: 'Successful restoration depends on planting the right species in the right zone.' },
+      { title: 'Add More Seedlings Quickly', cost: 14000, desc: 'Increase planting density without changing the plan.', impacts: { biodiversity: 3, waterQuality: 0, shoreline: 3, carbon: 4 }, outcome: 'More seedlings were planted, but many still competed for space.', takeaway: 'Quantity cannot replace good site planning.' },
+      { title: 'Stop Planting This Area', cost: 0, desc: 'Avoid more spending and abandon this patch.', impacts: { biodiversity: -4, waterQuality: 0, shoreline: -5, carbon: -4 }, outcome: 'The bare patch remained unstable and provided little habitat value.', takeaway: 'Abandoning difficult areas may leave gaps in shoreline protection.' }
+    ]
+  },
+  {
+    id: 7,
+    title: 'Visitor Trampling Damage',
+    x: 82,
+    y: 47,
+    observation: 'Visitors are walking through young mangrove areas, damaging seedlings and compacting sediment.',
+    options: [
+      { title: 'Boardwalk + Guided Access', cost: 23000, desc: 'Build a raised path and guide visitors away from sensitive areas.', impacts: { biodiversity: 8, waterQuality: 1, shoreline: 5, carbon: 4 }, outcome: 'The boardwalk redirected visitors and protected young seedlings.', takeaway: 'Good access design allows education and tourism without damaging fragile habitat.' },
+      { title: 'Rope Barrier and Signs', cost: 7000, desc: 'Mark no-entry zones with simple barriers.', impacts: { biodiversity: 3, waterQuality: 0, shoreline: 2, carbon: 1 }, outcome: 'Damage decreased, but some visitors still crossed the barrier.', takeaway: 'Low-cost barriers help, but sensitive sites often need stronger visitor management.' },
+      { title: 'Close Area Completely', cost: 4000, desc: 'Restrict access without providing an alternative path.', impacts: { biodiversity: 5, waterQuality: 0, shoreline: 2, carbon: 1 }, outcome: 'The area recovered, but community learning opportunities were reduced.', takeaway: 'Protection should balance ecosystem recovery with responsible public education.' }
+    ]
+  },
+  {
+    id: 8,
+    title: 'Community Livelihood Conflict',
+    x: 38,
+    y: 44,
+    observation: 'Some local fishers worry that restoration zones will reduce access to fishing grounds and income.',
+    options: [
+      { title: 'Co-Management Plan', cost: 16000, desc: 'Design restoration zones with community input and shared benefits.', impacts: { biodiversity: 7, waterQuality: 2, shoreline: 4, carbon: 3 }, outcome: 'Community support improved because local needs were included in the plan.', takeaway: 'Restoration is stronger when local communities are treated as partners, not obstacles.' },
+      { title: 'Compensation Only', cost: 19000, desc: 'Offer short-term financial support without shared planning.', impacts: { biodiversity: 2, waterQuality: 0, shoreline: 1, carbon: 1 }, outcome: 'Compensation reduced immediate conflict, but long-term trust remained weak.', takeaway: 'Money can reduce pressure, but participation builds lasting restoration support.' },
+      { title: 'Strict Enforcement', cost: 6000, desc: 'Use rules and patrols to block access quickly.', impacts: { biodiversity: 2, waterQuality: 0, shoreline: 1, carbon: 1 }, outcome: 'Access pressure dropped, but community resistance increased.', takeaway: 'Rules are important, but enforcement without engagement can create new social problems.' }
+    ]
+  }
+];
+
+const state = {
+  selectedSite: 'borneo',
+  budget: 120000,
+  metrics: { biodiversity: 50, waterQuality: 50, shoreline: 50, carbon: 50 },
+  resolved: new Set(),
+  history: [],
+  activeIncidentId: null,
+  selectedOptionIndex: null
+};
+
+/* ===================== DOM HELPERS ===================== */
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+const clamp = (value, min = 0, max = 100) => Math.max(min, Math.min(max, value));
+const formatRM = (value) => `RM ${value.toLocaleString('en-MY')}`;
+
+const boatState = {
+  x: window.innerWidth / 2,
+  y: window.innerHeight / 2,
+  targetX: window.innerWidth / 2,
+  targetY: window.innerHeight / 2,
+  rotation: 0,
+  animationStarted: false
+};
+const collectionRadius = 94;
+
+/* ===================== INITIALIZATION ===================== */
+document.addEventListener('DOMContentLoaded', () => {
+  bindStaticEvents();
+  renderTrees();
+  renderIncidentMarkers();
+  updateDashboard();
+  updateSitePanel('borneo');
+  updateEnvironmentVisuals();
+  startBoatCursor();
+});
+
+function bindStaticEvents() {
+  $('#beginBtn').addEventListener('click', startMission);
+  $('#closeIncidentBtn').addEventListener('click', closeIncidentModal);
+  $('#confirmDecisionBtn').addEventListener('click', confirmDecision);
+  $('#resultCloseBtn').addEventListener('click', hideResultPopup);
+  $('#resultContinueBtn').addEventListener('click', hideResultPopup);
+  //$('#resultReportBtn').addEventListener('click', openReportModal);
+  $('#viewReportBtn').addEventListener('click', openReportModal);
+  $('#closeReportBtn').addEventListener('click', closeReportModal);
+  $('#closeReportBtn2').addEventListener('click', closeReportModal);
+  $('#restartBtn').addEventListener('click', restartMission);
+  $('#exitMissionBtn').addEventListener('click', exitMission);
+
+  $('#stage').addEventListener('mousemove', (event) => setBoatTarget(event.clientX, event.clientY));
+  $('#stage').addEventListener('pointerdown', (event) => jumpBoatToTarget(event.clientX, event.clientY));
+  $('#stage').addEventListener('touchmove', (event) => {
+    const touch = event.touches[0];
+    if (touch) setBoatTarget(touch.clientX, touch.clientY);
+  }, { passive: true });
+  $('#stage').addEventListener('touchstart', (event) => {
+    const touch = event.touches[0];
+    if (touch) jumpBoatToTarget(touch.clientX, touch.clientY);
+  }, { passive: true });
+
+  $$('.hotspot').forEach((marker) => {
+    marker.addEventListener('click', () => updateSitePanel(marker.dataset.site));
+  });
+
+  $('#incidentModal').addEventListener('click', (event) => {
+    if (event.target.id === 'incidentModal') closeIncidentModal();
+  });
+  $('#reportModal').addEventListener('click', (event) => {
+    if (event.target.id === 'reportModal') closeReportModal();
+  });
+}
+
+function startMission() {
+  $('#home').classList.remove('active');
+  $('#game').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function exitMission() {
+  hideResultPopup();
+  closeIncidentModal();
+  closeReportModal();
+  $('#game').classList.remove('active');
+  $('#home').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+/* ===================== HOME MAP SYSTEM ===================== */
+function updateSitePanel(siteId) {
+  const site = sites[siteId];
+  state.selectedSite = siteId;
+  $$('.hotspot').forEach((marker) => marker.classList.toggle('active', marker.dataset.site === siteId));
+  $('#siteName').textContent = site.name;
+  $('#siteLocation').textContent = '📍' + site.location;
+  $('#siteThreat').textContent = site.threat;
+  $('#siteMission').textContent = site.mission;
+  $('#siteFact').textContent = site.fact;
+  /* $('#activeSiteName').textContent = site.name.replace('Coastal ', '').replace('Mangrove ', 'Mangrove '); */
+}
+
+/* ===================== GAME SCENE SYSTEM ===================== */
+function renderTrees() {
+  $('#mangroveLine').innerHTML = Array.from({ length: 12 }, (_, index) => {
+    const deadClass = index % 5 === 0 ? 'dead' : '';
+    return `<span class="tree tree-pos-${index + 1} ${deadClass}">🌳</span>`;
+  }).join('');
+}
+
+function renderIncidentMarkers() {
+  $('#incidentLayer').innerHTML = incidents.map((incident) => createIncidentMarkerHtml(incident)).join('');
+  $$('.incident-marker').forEach((marker) => {
+    marker.addEventListener('click', () => openIncidentModal(Number(marker.dataset.id)));
+  });
+}
+
+function createIncidentMarkerHtml(incident) {
+  const isResolved = state.resolved.has(incident.id);
+  const label = isResolved ? 'RESOLVED' : 'ACTIVE INCIDENT';
+  const markerLabels = {
+    1: 'OIL SPILL',
+    2: 'PLASTIC',
+    3: 'GHOST NET',
+    4: 'EROSION',
+    5: 'WATER',
+    6: 'REPLANTING',
+    7: 'TOURISM',
+    8: 'COMMUNITY'
+  };
+  const warningIcon = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+      <line x1="12" y1="9" x2="12" y2="13"></line>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>`;
+  const resolvedIcon = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+      <path d="M20 6L9 17l-5-5"></path>
+    </svg>`;
+
+  return `
+    <button class="incident-marker incident-pos-${incident.id} ${isResolved ? 'resolved' : ''}" data-id="${incident.id}" aria-label="${label}: ${incident.title}">
+      <span class="marker-btn">${isResolved ? resolvedIcon : warningIcon}</span>
+      <span class="marker-num">${markerLabels[incident.id] || String(incident.id).padStart(2, '0')}</span>
+    </button>
+  `;
+}
+
+function updateEnvironmentVisuals() {
+  const progress = state.resolved.size / incidents.length;
+  $$('.pollution-cluster').forEach((cluster) => {
+    cluster.classList.toggle('resolved', state.resolved.has(Number(cluster.dataset.clusterId)));
+  });
+  $('#fishGroup').classList.toggle('visible', state.metrics.biodiversity >= 60 || progress > .35);
+  $('#birdGroup').classList.toggle('visible', state.metrics.biodiversity >= 70 || progress > .65);
+  $('#crabGroup').classList.toggle('visible', state.metrics.waterQuality >= 62 || progress > .45);
+  $$('.tree').forEach((tree) => {
+    tree.classList.toggle('healthy', state.metrics.carbon >= 65 || progress > .5);
+    tree.classList.toggle('dead', state.metrics.carbon < 42 && !tree.classList.contains('healthy'));
+  });
+}
+
+/* ===================== INCIDENT MODAL SYSTEM ===================== */
+function openIncidentModal(incidentId) {
+  const incident = incidents.find((item) => item.id === incidentId);
+  const marker = $(`.incident-marker[data-id="${incidentId}"]`);
+  if (marker && !marker.classList.contains('near') && !state.resolved.has(incidentId)) {
+    $('#resultTitle').textContent = 'Move Closer';
+    $('#outcomeText').textContent = 'Move the 🚤 cursor until the warning marker and threat items glow, then click again.';
+    $('#takeawayText').textContent = 'Collision feedback helps players connect the boat patrol action with the environmental hotspot.';
+    $('#resultIncidentState').textContent = 'IN RANGE NEEDED';
+    $('#resultCostTag').textContent = 'RM 0';
+    $('#resultPopup').classList.add('show');
+    return;
+  }
+  if (!incident || state.resolved.has(incidentId)) {
+    showResolvedResult(incident);
+    return;
+  }
+  state.activeIncidentId = incidentId;
+  state.selectedOptionIndex = null;
+  $('#incidentType').textContent = 'ACTIVE INCIDENT';
+  $('#incidentTitle').textContent = incident.title;
+  $('#incidentObservation').textContent = incident.observation;
+  $('#analysisPreview').textContent = 'Select a response to preview its ecological trade-off.';
+  $('#confirmDecisionBtn').disabled = true;
+  renderOptions(incident);
+  $('#incidentModal').classList.add('open');
+}
+
+function renderOptions(incident) {
+  $('#optionList').innerHTML = incident.options.map((option, index) => {
+    const affordable = option.cost <= state.budget;
+    const impacts = Object.entries(option.impacts).map(([key, value]) => {
+      const label = key.replace('waterQuality', 'Water').replace('biodiversity', 'Biodiversity').replace('shoreline', 'Shoreline').replace('carbon', 'Carbon');
+      return `<span class="impact-tag ${value < 0 ? 'neg' : ''}">${label} ${value >= 0 ? '+' : ''}${value}</span>`;
+    }).join('');
+    return `
+      <button class="option-card" data-index="${index}" ${affordable ? '' : 'disabled'}>
+        ${affordable ? '' : '<span class="insufficient">INSUFFICIENT BUDGET</span>'}
+        <div class="option-title">${String.fromCharCode(65 + index)}. ${option.title}</div>
+        <div class="option-cost">Cost: ${formatRM(option.cost)}</div>
+        <div class="option-impact">${impacts}</div>
+        <div class="option-desc">${option.desc}</div>
+      </button>
+    `;
+  }).join('');
+
+  $$('.option-card').forEach((card) => {
+    card.addEventListener('click', () => selectOption(Number(card.dataset.index)));
+  });
+}
+
+function selectOption(optionIndex) {
+  const incident = getActiveIncident();
+  const option = incident.options[optionIndex];
+  if (!option || option.cost > state.budget) return;
+  state.selectedOptionIndex = optionIndex;
+  $$('.option-card').forEach((card) => card.classList.toggle('selected', Number(card.dataset.index) === optionIndex));
+  $('#confirmDecisionBtn').disabled = false;
+  $('#analysisPreview').textContent = `Preview: ${option.title} costs ${formatRM(option.cost)} and changes ecosystem indicators immediately.`;
+}
+
+function confirmDecision() {
+  const incident = getActiveIncident();
+  const option = incident.options[state.selectedOptionIndex];
+  if (!incident || !option || option.cost > state.budget) return;
+
+  state.budget -= option.cost;
+  Object.keys(state.metrics).forEach((key) => {
+    state.metrics[key] = clamp(state.metrics[key] + (option.impacts[key] || 0));
+  });
+  state.resolved.add(incident.id);
+  state.history.push({ incident: incident.title, choice: option.title, cost: option.cost, outcome: option.outcome, takeaway: option.takeaway });
+
+  closeIncidentModal();
+  renderIncidentMarkers();
+  updateDashboard();
+  updateEnvironmentVisuals();
+  showLearningResult(incident, option);
+
+  if (state.resolved.size === incidents.length) {
+    setTimeout(openReportModal, 500);
+  }
+}
+
+function closeIncidentModal() {
+  $('#incidentModal').classList.remove('open');
+}
+
+function getActiveIncident() {
+  return incidents.find((incident) => incident.id === state.activeIncidentId);
+}
+
+/* ===================== LEARNING RESULT POPUP SYSTEM ===================== */
+function showLearningResult(incident, option) {
+
+  $('#resultTitle').textContent = `Decision Outcome: ${incident.title}`;
+  $('#outcomeText').textContent = option.outcome;
+  $('#takeawayText').textContent = option.takeaway;
+  $('#resultIncidentState').textContent = 'RESOLVED';
+  $('#resultCostTag').textContent = formatRM(option.cost);
+  $('#resultPopup').classList.add('show');
+}
+
+function showResolvedResult(incident) {
+  const saved = state.history.find((item) => item.incident === incident.title);
+  if (!saved) return;
+  $('#resultIncidentState').textContent = 'RESOLVED';
+  $('#resultCostTag').textContent = formatRM(saved.cost);
+  $('#resultTitle').textContent = `Resolved Incident: ${incident.title}`;
+  $('#outcomeText').textContent = saved.outcome;
+  $('#takeawayText').textContent = saved.takeaway;
+  $('#resultPopup').classList.add('show');
+}
+
+function hideResultPopup() {
+  $('#resultPopup').classList.remove('show');
+}
+
+
+/* ===================== BOAT CURSOR + COLLISION SYSTEM ===================== */
+function setBoatTarget(clientX, clientY) {
+  boatState.targetX = clientX;
+  boatState.targetY = clientY;
+}
+
+function jumpBoatToTarget(clientX, clientY) {
+  boatState.x = clientX;
+  boatState.y = clientY;
+  setBoatTarget(clientX, clientY);
+}
+
+function startBoatCursor() {
+  if (boatState.animationStarted) return;
+  boatState.animationStarted = true;
+  requestAnimationFrame(updateBoatCursor);
+}
+
+function updateBoatCursor() {
+  const boatWrapper = $('#boatWrapper');
+  const boatCursor = $('#boatCursor');
+  if (boatWrapper && boatCursor) {
+    const previousX = boatState.x;
+    boatState.x += (boatState.targetX - boatState.x) * 0.08;
+    boatState.y += (boatState.targetY - boatState.y) * 0.08;
+
+    const dx = boatState.x - previousX;
+    const targetRotation = Math.max(-18, Math.min(18, dx * 0.8));
+    boatState.rotation += (targetRotation - boatState.rotation) * 0.1;
+
+    boatWrapper.style.left = `${boatState.x}px`;
+    boatWrapper.style.top = `${boatState.y}px`;
+    boatCursor.style.transform = `translate(-50%, -50%) rotate(${boatState.rotation}deg)`;
+    checkThreatCollision();
+  }
+  requestAnimationFrame(updateBoatCursor);
+}
+
+function checkThreatCollision() {
+  let anyNear = false;
+
+  $$('.incident-marker:not(.resolved)').forEach((marker) => {
+    const markerRect = marker.getBoundingClientRect();
+    const markerX = markerRect.left + markerRect.width / 2;
+    const markerY = markerRect.top + markerRect.height / 2;
+    const distance = Math.hypot(markerX - boatState.x, markerY - boatState.y);
+    const isNear = distance <= collectionRadius;
+    const cluster = $(`.pollution-cluster[data-cluster-id="${marker.dataset.id}"]`);
+
+    marker.classList.toggle('near', isNear);
+    if (cluster) cluster.classList.toggle('near', isNear);
+    if (isNear) anyNear = true;
+  });
+
+  const collectionRing = $('#collectionRing');
+  if (collectionRing) collectionRing.classList.toggle('active', anyNear);
+}
+
+/* ===================== DASHBOARD + REPORT SYSTEM ===================== */
+function updateDashboard() {
+  const resolved = state.resolved.size;
+  const progressPercent = (resolved / incidents.length) * 100;
+  $('#budgetVal').textContent = formatRM(state.budget);
+  $('#progressVal').textContent = `${resolved}/${incidents.length}`;
+  if ($('#resolvedVal')) $('#resolvedVal').textContent = `${resolved}`;
+  $('#progressFill').style.width = `${progressPercent}%`;
+  if ($('#resolvedFill')) $('#resolvedFill').style.width = `${progressPercent}%`;
+
+  const metricMap = {
+    biodiversity: ['#biodiversityVal', '#biodiversityFill'],
+    waterQuality: ['#waterQualityVal', '#waterQualityFill'],
+    shoreline: ['#shorelineVal', '#shorelineFill'],
+    carbon: ['#carbonVal', '#carbonFill']
+  };
+
+  Object.entries(metricMap).forEach(([key, selectors]) => {
+    const value = state.metrics[key];
+    $(selectors[0]).textContent = value;
+    $(selectors[1]).style.width = `${value}%`;
+  });
+}
+
+function openReportModal() {
+  updateReportContent();
+  $('#reportModal').classList.add('open');
+}
+
+function closeReportModal() {
+  $('#reportModal').classList.remove('open');
+}
+
+function updateReportContent() {
+  const averageScore = Math.round(Object.values(state.metrics).reduce((sum, value) => sum + value, 0) / 4);
+  let classification = 'IN PROGRESS';
+  let status = 'Active Mission';
+  let summary = 'Mission has started. Resolve more incidents to generate a stronger restoration outcome.';
+
+  if (state.resolved.size === incidents.length) {
+    if (averageScore >= 75) {
+      classification = 'SUCCESSFUL RESTORATION';
+      status = 'Ecosystem Stabilized';
+      summary = 'Your decisions improved ecosystem health across most indicators. The mangrove area shows strong recovery potential.';
+    } else if (averageScore >= 55) {
+      classification = 'PARTIAL RECOVERY';
+      status = 'Needs Continued Monitoring';
+      summary = 'The site improved, but some indicators still need follow-up action and long-term monitoring.';
+    } else {
+      classification = 'HIGH RISK OUTCOME';
+      status = 'Restoration Incomplete';
+      summary = 'Several ecosystem indicators remain weak. Future plans should prioritize early response, prevention, and community support.';
+    }
+  }
+
+  $('#classification').textContent = classification;
+  $('#reportSummary').textContent = summary;
+  $('#reportResolved').textContent = `${state.resolved.size} / ${incidents.length}`;
+  $('#reportBudget').textContent = formatRM(state.budget);
+  $('#reportScore').textContent = `${averageScore}`;
+  $('#reportStatus').textContent = status;
+  $('#decisionHistory').innerHTML = state.history.length
+    ? state.history.map((item, index) => `<p><strong>${index + 1}. ${item.incident}</strong><br>Response: ${item.choice} (${formatRM(item.cost)})</p>`).join('')
+    : '<p>No decisions made yet.</p>';
+}
+
+function restartMission() {
+  state.budget = 120000;
+  state.metrics = { biodiversity: 50, waterQuality: 50, shoreline: 50, carbon: 50 };
+  state.resolved = new Set();
+  state.history = [];
+  state.activeIncidentId = null;
+  state.selectedOptionIndex = null;
+  hideResultPopup();
+  closeReportModal();
+  renderTrees();
+  renderIncidentMarkers();
+  updateDashboard();
+  updateEnvironmentVisuals();
+  checkThreatCollision();
+}
+</script>
+</body>
+</html>
