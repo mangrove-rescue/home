@@ -164,34 +164,34 @@ const incidents = [
     ]
   },
   {
-    id: 5, x: 82, y: 47, marker: 'HABITAT LOSS', title: 'Habitat Loss',
-    situation: 'Mangrove habitat is shrinking, reducing shelter for fish, shrimp, and crabs.',
-    question: 'How should the damaged habitat be restored?',
-    options: [
-      {
-        title: 'Native Mangrove Replanting',
-        cost: 20000,
-        expectedOutcome: 'Restores living mangrove habitat over time.',
-        effects: { pollution: -4, biodiversity: 15, health: 16, fish: 8, shrimp: 8, community: 8 },
-        visualFeedback: 'Turn 1: seedlings are planted. Turn 2: tree set and village progress improve.',
-        learningPopup: 'Native mangroves restore root habitats used by young fish, shrimp, and crabs.'
-      },
-      {
-        title: 'Protect Remaining Habitat Zones',
-        cost: 12000,
-        expectedOutcome: 'Prevents further damage to existing mangroves.',
-        effects: { pollution: -2, biodiversity: 8, health: 9, fish: 4, shrimp: 4, community: 3 },
-        visualFeedback: 'Existing trees become healthier and brighter.',
-        learningPopup: 'Preservation protects the existing forest, but degraded areas recover slowly without replanting.'
-      },
-      {
-        title: 'Temporary Habitat Structures',
-        cost: 8000,
-        expectedOutcome: 'Creates short-term shelter for young marine life.',
-        effects: { pollution: 0, biodiversity: 4, health: 3, fish: 6, shrimp: 3, community: 1 },
-        visualFeedback: 'Habitat structures appear and fish visibility improves slightly.',
-        learningPopup: 'Artificial shelters help temporarily, but they cannot replace a living mangrove forest.'
-      }
+    id: 5, x: 82, y: 47, marker: 'EROSION', title: 'Erosion',
+  situation: 'Strong waves and tidal action are eroding the shoreline. Mangrove roots are being exposed, and sections of the coastline are beginning to collapse.',
+  question: 'How should this be managed?',
+  options: [
+    {
+      title: 'Mangrove Restoration Program',
+      cost: 20000,
+      expectedOutcome: 'Native mangroves were planted along vulnerable sections of the shoreline.',
+      effects: { pollution: 0, biodiversity: 15, health: 12, fish: 8, shrimp: 6, community: 5 },
+      visualFeedback: 'Mangrove seedlings were planted and shoreline erosion began to slow as roots stabilized the soil.',
+      learningPopup: 'Mangrove roots help stabilize soil, reduce erosion, and protect coastlines from wave damage.'
+    },
+    {
+      title: 'Install Eco-Friendly Wave Barriers',
+      cost: 12000,
+      expectedOutcome: 'Wave barriers reduced erosion in high-risk areas.',
+      effects: { pollution: 0, biodiversity: 8, health: 7, fish: 4, shrimp: 3, community: 2 },
+      visualFeedback: 'Eco-friendly barriers reduced shoreline damage and protected exposed mangrove roots.',
+      learningPopup: 'Nature-based infrastructure can help reduce erosion while supporting ecosystem recovery.'
+    },
+    {
+      title: 'Monitor Shoreline Changes',
+      cost: 5000,
+      expectedOutcome: 'Monitoring programs collected information about erosion trends.',
+      effects: { pollution: 0, biodiversity: 2, health: 2, fish: 1, shrimp: 1, community: 0 },
+      visualFeedback: 'Monitoring stations were installed, but erosion continued to affect the coastline.',
+      learningPopup: 'Monitoring helps identify risks, but active restoration is needed to prevent further erosion.'
+    }
     ]
   },
   {
