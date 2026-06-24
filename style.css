@@ -1037,9 +1037,9 @@ button { font: inherit; }
   .income-hint { max-width: 145px; }
   .recovery-set { font-size: 1.05rem; }
 
-  .plant-stage-1 { width: 32px; }
-  .plant-stage-2 { width: 55px; }
-  .plant-stage-3 { width: 80px; }
+  .plant-stage-1 { width: 55px; }
+  .plant-stage-2 { width: 80px; }
+  .plant-stage-3 { width: 100px; }
 }
 
 
