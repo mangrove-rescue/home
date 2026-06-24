@@ -1034,7 +1034,7 @@ button { font: inherit; }
 @media (max-width: 700px) {
   .income-options { grid-template-columns: 1fr; }
   .fisherman-layer { right: 12px; bottom: 116px; }
-  .income-hint { max-width: 145px; }
+
   .recovery-set { font-size: 1.05rem; }
 
   .plant-stage-1 { width: 55px; }
